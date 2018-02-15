@@ -38,3 +38,4 @@ set(SOURCE_FILES
 add_executable(StarSpace ${SOURCE_FILES} src/main.cpp)
 
 add_subdirectory(src/apps)
+
