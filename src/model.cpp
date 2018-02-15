@@ -690,7 +690,7 @@ void EmbedModel::loadTsv(const char* fname, const string sep) {
   };
 
   auto len = filelen(ifs);
-  auto numThreads = sysconf(_SC_NPROCESSORS_ONLN);
+  auto numThreads = std::thread::hardware_concurrency();
   vector<off_t> partitions(numThreads + 1);
   partitions[0] = 0;
   partitions[numThreads] = len;
