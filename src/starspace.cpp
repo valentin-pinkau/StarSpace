@@ -457,7 +457,7 @@ void StarSpace::saveModel(const string& filename) {
 void StarSpace::saveModelTsv(const string& filename) {
   cout << "Saving model in tsv format : " << filename << endl;
   ofstream fout(filename);
-  model_->saveTsv(fout, '\t');
+  model_->saveTsv(fout, ' ');
   fout.close();
 }
 
