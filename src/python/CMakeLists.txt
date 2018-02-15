@@ -1,5 +1,5 @@
 project(starspace)
 
-find_package(pybind11 2.2.1)
+add_subdirectory(pybind11)
 
 pybind11_add_module(starspace ${SOURCE_FILES} starspace_wrapper.cpp)
