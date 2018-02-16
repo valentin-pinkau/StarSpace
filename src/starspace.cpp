@@ -165,7 +165,22 @@ void StarSpace::initFromTsv(const string& filename) {
   initDataHandler();
 }
 
+bool StarSpace::load_model_if_set(std::string path) {
+  if (path == "") return false;
+
+  if (boost::algorithm::ends_with(path, ".tsv")) {
+    initFromTsv(path);
+  } else {
+    initFromSavedModel(path);
+    cout << "------Loaded model args:\n";
+    args_->printArgs();
+  }
+
+  return true;
+}
+
 void StarSpace::train() {
+
   float rate = args_->lr;
   float decrPerEpoch = (rate - 1e-9) / args_->epoch;
 
@@ -199,6 +214,8 @@ void StarSpace::train() {
       break;
     }
   }
+  saveModel(args_->model);
+  saveModelTsv(args_->model + ".tsv");
 }
 
 void StarSpace::parseDoc(

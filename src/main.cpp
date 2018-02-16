@@ -21,28 +21,14 @@ int main(int argc, char** argv) {
 
   StarSpace sp(args);
   if (args->isTrain) {
-    if (!args->initModel.empty()) {
-      if (boost::algorithm::ends_with(args->initModel, ".tsv")) {
-        sp.initFromTsv(args->initModel);
-      } else {
-        sp.initFromSavedModel(args->initModel);
-        cout << "------Loaded model args:\n";
-        args->printArgs();
-      }
+    // load model, if given
+    if (sp.load_model_if_set(args->initModel)) {
     } else {
       sp.init();
     }
     sp.train();
-    sp.saveModel(args->model);
-    sp.saveModelTsv(args->model + ".tsv");
   } else {
-    if (boost::algorithm::ends_with(args->model, ".tsv")) {
-      sp.initFromTsv(args->model);
-    } else {
-      sp.initFromSavedModel(args->model);
-      cout << "------Loaded model args:\n";
-      args->printArgs();
-    }
+    if(!sp.load_model_if_set(args->model)) return -1;
     sp.evaluate();
   }
 

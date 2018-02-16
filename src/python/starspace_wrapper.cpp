@@ -1,14 +1,12 @@
-//
-// Created by Valentin Pinkau on 14.02.18.
-//
-
 #include <pybind11/pybind11.h>
+#include "../starspace.h"
 
 int add(int i, int j) {
     return i + j;
 }
 
 namespace py = pybind11;
+using namespace starspace;
 
 PYBIND11_MODULE(starspace, m) {
 m.doc() = R"pbdoc(

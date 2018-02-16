@@ -26,6 +26,7 @@ class StarSpace {
     explicit StarSpace(std::shared_ptr<Args> args);
 
     void init();
+    bool load_model_if_set(std::string path);
     void initFromTsv(const std::string& filename);
     void initFromSavedModel(const std::string& filename);
 
