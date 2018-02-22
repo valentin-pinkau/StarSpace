@@ -5,7 +5,7 @@ project(StarSpace)
 find_package(Boost 1.63.0)
 include_directories(${Boost_INCLUDE_DIRS})
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -funroll-loops")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O0 -fno-inline")
@@ -38,4 +38,4 @@ set(SOURCE_FILES
 add_executable(StarSpace ${SOURCE_FILES} src/main.cpp)
 
 add_subdirectory(src/apps)
-add_subdirectory(src/python)
+
