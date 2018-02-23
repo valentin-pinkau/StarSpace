@@ -5,7 +5,6 @@ import setuptools
 
 __version__ = '0.0.1'
 
-
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
     The purpose of this class is to postpone importing pybind11
@@ -22,14 +21,18 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'starspace',
-        ['src/python/starspace_wrapper.cpp'],
+        'starspace_wrapper',
+        ['python/pybind/starspace_wrapper.cpp',
+         'src/utils/args.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
-            get_pybind_include(user=True)
+            get_pybind_include(user=True),
+            'src',
+            'src/utils/'
         ],
-        language='c++'
+        language='c++',
+        extra_compile_args=["-O3 -funroll-loops"],
     ),
 ]
 
@@ -99,5 +102,9 @@ setup(
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.2'],
     cmdclass={'build_ext': BuildExt},
+    packages=[
+        str('starspace'),
+    ],
+    package_dir={str(''): str('python')},
     zip_safe=False,
 )
