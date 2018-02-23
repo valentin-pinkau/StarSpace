@@ -23,7 +23,17 @@ ext_modules = [
     Extension(
         'starspace_wrapper',
         ['python/pybind/starspace_wrapper.cpp',
-         'src/utils/args.cpp'],
+         'src/utils/args.cpp',
+         'src/utils/normalize.cpp',
+         'src/utils/utils.cpp',
+         'src/data.cpp',
+         'src/dict.cpp',
+         'src/doc_data.cpp',
+         'src/doc_parser.cpp',
+         'src/model.cpp',
+         'src/parser.cpp',
+         'src/proj.cpp',
+         'src/starspace.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
@@ -72,13 +82,18 @@ class BuildExt(build_ext):
         'msvc': ['/EHsc'],
         'unix': [],
     }
+    link_opts = {
+        'unix': []
+    }
 
     if sys.platform == 'darwin':
         c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
+        link_opts['unix'] += ['-mmacosx-version-min=10.7']
 
     def build_extensions(self):
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
+        l_opts = self.link_opts.get(ct, [])
         if ct == 'unix':
             opts.append('-DVERSION_INFO="%s"' % self.distribution.get_version())
             opts.append(cpp_flag(self.compiler))
@@ -89,6 +104,7 @@ class BuildExt(build_ext):
             opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
         for ext in self.extensions:
             ext.extra_compile_args = opts
+            ext.extra_link_args = l_opts
         build_ext.build_extensions(self)
 
 

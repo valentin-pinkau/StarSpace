@@ -1,11 +1,8 @@
 #include <pybind11/pybind11.h>
 #include "../../src/starspace.h"
 
-int add(int i, int j) {
-    return i + j;
-}
-
 namespace py = pybind11;
+using namespace pybind11::literals;
 using namespace starspace;
 
 
@@ -20,7 +17,7 @@ m.doc() = R"pbdoc(
            subtract
     )pbdoc";
 
-py::class_<Args>(m, "args")
+py::class_<Args, std::shared_ptr<Args>>(m, "Args")
     .def(py::init<>())
     .def_readwrite("lr", &Args::lr)
     .def_readwrite("termLr", &Args::termLr)
@@ -59,10 +56,9 @@ py::class_<Args>(m, "args")
     .def_readwrite("useWeight", &Args::useWeight)
     .def_readwrite("trainWord", &Args::trainWord);
 
-m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-        Some other explanation about the subtract function.
-    )pbdoc");
+py::class_<StarSpace>(m, "StarSpaceWrapper")
+    .def(py::init<std::shared_ptr<Args>>())
+    .def("init", &StarSpace::init, "path"_a="");
 
 #ifdef VERSION_INFO
 m.attr("__version__") = VERSION_INFO;

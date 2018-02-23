@@ -1,4 +1,5 @@
-from starspace_wrapper import args
+from starspace_wrapper import Args
+from starspace_wrapper import StarSpaceWrapper
 
 def build_args():
     pass
@@ -42,5 +43,7 @@ class StarSpace:
               useWeight = False,
               trainWord = False,):
 
-        a = args()
+        a = Args()
+        spw = StarSpaceWrapper(a)
+        spw.init()
         print(a.lr)
