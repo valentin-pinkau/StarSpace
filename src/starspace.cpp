@@ -70,9 +70,11 @@ shared_ptr<InternDataHandler> StarSpace::initData() {
 }
 
 // initialize dict and load data
-void StarSpace::init() {
+void StarSpace::init(std::string path="") {
   cout << "Start to initialize starspace model.\n";
   assert(args_ != nullptr);
+
+  if(!load_model_if_set(path)) return;
 
   // build dict
   initParser();

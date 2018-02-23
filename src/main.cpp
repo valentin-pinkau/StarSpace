@@ -21,14 +21,10 @@ int main(int argc, char** argv) {
 
   StarSpace sp(args);
   if (args->isTrain) {
-    // load model, if given
-    if (sp.load_model_if_set(args->initModel)) {
-    } else {
-      sp.init();
-    }
+    sp.init(args->initModel);
     sp.train();
   } else {
-    if(!sp.load_model_if_set(args->model)) return -1;
+    sp.init(args->model);
     sp.evaluate();
   }
 

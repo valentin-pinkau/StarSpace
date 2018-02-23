@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
   args->model = model;
 
   StarSpace sp(args);
-  sp.initFromSavedModel(args->model);
+  sp.init(args->model);
   // set useWeight by default.
   // use 1.0 for default weight if weight is not found
   args->useWeight = true;

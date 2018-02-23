@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
   args->model = model;
 
   StarSpace sp(args);
-  sp.initFromSavedModel(args->model);
+  sp.init(args->model);
   if (args->ngrams == 1) {
     std::cerr << "Error: your provided model does not use ngram.\n";
     exit(EXIT_FAILURE);

@@ -29,13 +29,7 @@ int main(int argc, char** argv) {
   }
 
   StarSpace sp(args);
-  if (boost::algorithm::ends_with(args->model, ".tsv")) {
-    sp.initFromTsv(args->model);
-  } else {
-    sp.initFromSavedModel(args->model);
-    cout << "------Loaded model args:\n";
-    args->printArgs();
-  }
+  sp.init(args->model);
   // Set dropout probability to 0 in test case.
   sp.args_->dropoutLHS = 0.0;
   sp.args_->dropoutRHS = 0.0;

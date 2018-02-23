@@ -25,11 +25,7 @@ class StarSpace {
   public:
     explicit StarSpace(std::shared_ptr<Args> args);
 
-    void init();
-    bool load_model_if_set(std::string path);
-    void initFromTsv(const std::string& filename);
-    void initFromSavedModel(const std::string& filename);
-
+    void init(std::string path);
     void train();
     void evaluate();
 
@@ -59,6 +55,9 @@ class StarSpace {
     std::shared_ptr<Args> args_;
     std::vector<std::vector<Base>> baseDocs_;
   private:
+    bool load_model_if_set(std::string path);
+    void initFromTsv(const std::string& filename);
+    void initFromSavedModel(const std::string& filename);
     void initParser();
     void initDataHandler();
     std::shared_ptr<InternDataHandler> initData();
