@@ -13,7 +13,9 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <assert.h>
+#include <cassert>
+#include <numeric>
+#include <random>
 
 using namespace std;
 
@@ -74,11 +76,12 @@ void LayerDataHandler::insert(
   } else {
     // dropout enabled
     auto rnd = [&] {
-      static __thread unsigned int rState;
-      return rand_r(&rState);
+      static thread_local std::mt19937 generator;
+      std::uniform_real_distribution<double> distribution(0.0, 1.0);
+      return distribution(generator);
     };
     for (const auto& it : ex) {
-      auto p = (double)(rnd()) / RAND_MAX;
+      auto p = rnd();
       if (p > dropout) {
         rslt.push_back(it);
       }

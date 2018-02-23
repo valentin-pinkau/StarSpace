@@ -77,7 +77,7 @@ extern thread_local int id;
 }
 
 namespace {
-inline int getThreadID() {
+int getThreadID() {
   return detail::id;
 }
 }

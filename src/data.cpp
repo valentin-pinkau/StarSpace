@@ -13,7 +13,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <assert.h>
+#include <cassert>
+#include <numeric>
 
 using namespace std;
 
