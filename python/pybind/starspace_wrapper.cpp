@@ -19,6 +19,9 @@ m.doc() = R"pbdoc(
 
 py::class_<Args, std::shared_ptr<Args>>(m, "Args")
     .def(py::init<>())
+    .def_readwrite("trainFile", &Args::trainFile)
+    .def_readwrite("model", &Args::model)
+    .def_readwrite("initModel", &Args::initModel)
     .def_readwrite("lr", &Args::lr)
     .def_readwrite("termLr", &Args::termLr)
     .def_readwrite("norm", &Args::norm)
@@ -58,7 +61,8 @@ py::class_<Args, std::shared_ptr<Args>>(m, "Args")
 
 py::class_<StarSpace>(m, "StarSpaceWrapper")
     .def(py::init<std::shared_ptr<Args>>())
-    .def("init", &StarSpace::init, "path"_a="");
+    .def("init", &StarSpace::init, "path"_a="")
+    .def("train", &StarSpace::train, py::call_guard<py::gil_scoped_release>());
 
 #ifdef VERSION_INFO
 m.attr("__version__") = VERSION_INFO;

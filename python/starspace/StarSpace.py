@@ -1,12 +1,20 @@
 from starspace_wrapper import Args
 from starspace_wrapper import StarSpaceWrapper
 
-def build_args():
-    pass
+def build_args(args):
+    a = Args()
+    for (k, v) in args.items():
+        setattr(a, k, v)
+    return a
 
 class StarSpace:
+    spw = None
 
-    def train(self,
+    @staticmethod
+    def train(
+              trainFile,
+              model = "model",
+              initModel = "",
               lr = 0.01,
               termLr = 1e-9,
               norm = 1.0,
@@ -20,7 +28,7 @@ class StarSpace:
               epoch = 5,
               ws = 5,
               maxTrainTime = 60*60*24*100,
-              thread = 10,
+              thread = 1,
               maxNegSamples = 10,
               negSearchLimit = 50,
               minCount = 1,
@@ -43,7 +51,10 @@ class StarSpace:
               useWeight = False,
               trainWord = False,):
 
-        a = Args()
+        a = build_args(locals())
         spw = StarSpaceWrapper(a)
-        spw.init()
-        print(a.lr)
+        spw.init(a.initModel)
+        spw.train()
+
+
+
