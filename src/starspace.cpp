@@ -236,6 +236,11 @@ Matrix<Real> StarSpace::getDocVector(const string& line, const string& sep) {
   return model_->projectLHS(ids);
 }
 
+Matrix<Real> StarSpace::getLabelVector(const string& line, const string& sep) {
+  vector<Base> ids;
+  parseDoc(line, ids, sep);
+  return model_->projectRHS(ids);
+}
 MatrixRow StarSpace::getNgramVector(const string& phrase) {
   vector<string> tokens;
   boost::split(tokens, phrase, boost::is_any_of(string(" ")));

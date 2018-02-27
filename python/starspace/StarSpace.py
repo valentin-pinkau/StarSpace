@@ -1,17 +1,21 @@
 from starspace_wrapper import Args
 from starspace_wrapper import StarSpaceWrapper
 
+import numpy as np
+
 def build_args(args):
     a = Args()
     for (k, v) in args.items():
-        setattr(a, k, v)
+        if k != "self":
+            setattr(a, k, v)
     return a
 
 class StarSpace:
-    spw = None
 
-    @staticmethod
-    def train(
+    def __init__(self):
+        self.spw = None
+
+    def train(self,
               trainFile,
               model = "model",
               initModel = "",
@@ -19,11 +23,9 @@ class StarSpace:
               termLr = 1e-9,
               norm = 1.0,
               margin = 0.05,
-              wordWeight = 0.5,
               initRandSd = 0.001,
               dropoutLHS = 0.0,
               dropoutRHS = 0.0,
-              p = 0.5,
               dim = 10,
               epoch = 5,
               ws = 5,
@@ -33,9 +35,7 @@ class StarSpace:
               negSearchLimit = 50,
               minCount = 1,
               minCountLabel = 1,
-              K = 5,
               verbose = False,
-              debug = False,
               adagrad = True,
               normalizeText = False,
               trainMode = 0,
@@ -48,13 +48,36 @@ class StarSpace:
               shareEmb = True,
               saveEveryEpoch = False,
               saveTempModel = False,
-              useWeight = False,
-              trainWord = False,):
+              useWeight = False):
 
         a = build_args(locals())
-        spw = StarSpaceWrapper(a)
-        spw.init(a.initModel)
-        spw.train()
+        self.spw = StarSpaceWrapper(a)
+        self.spw.init(a.initModel)
+        self.spw.train()
+
+    def getVector(self, input_data,  model="", sep="\t ", side="LHS"):
+
+        assert side in ["LHS", "RHS"]
+
+        if model != "":
+            self.spw = StarSpaceWrapper(Args())
+            self.spw.init(model)
+
+        assert self.spw is not None
+
+
+        for data in input_data:
+            if side == "LHS":
+                yield np.array(self.spw.getDocVector(data, sep))[0, :]
+            elif side == "RHS":
+                yield np.array(self.spw.getLabelVector(data, sep))[0, :]
+
+
+
+
+
+
+
 
 
 

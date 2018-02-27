@@ -33,6 +33,9 @@ class StarSpace {
     Matrix<Real> getDocVector(
         const std::string& line,
         const std::string& sep = " \t");
+  Matrix<Real> getLabelVector(
+        const std::string& line,
+        const std::string& sep = " \t");
     void parseDoc(
         const std::string& line,
         std::vector<Base>& ids,

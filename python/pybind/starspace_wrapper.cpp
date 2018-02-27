@@ -59,10 +59,26 @@ py::class_<Args, std::shared_ptr<Args>>(m, "Args")
     .def_readwrite("useWeight", &Args::useWeight)
     .def_readwrite("trainWord", &Args::trainWord);
 
+py::class_<Matrix<Real>>(m, "Matrix", py::buffer_protocol(), py::module_local())
+    .def(py::init<MatrixDims, Real>())
+    .def(py::init<const std::vector<std::vector<Real>>&>())
+    .def_buffer([](Matrix<Real>& m) -> py::buffer_info {
+      return py::buffer_info(
+          &m.matrix.data()[0],
+          sizeof(Real),
+          py::format_descriptor<Real>::format(),
+          2,
+          {static_cast<long>(m.matrix.size1()), static_cast<long>(m.matrix.size2())},
+          {static_cast<long>(sizeof(Real) * m.matrix.size2()),
+           static_cast<long>(sizeof(Real) * (int64_t)1)});
+    });
+
 py::class_<StarSpace>(m, "StarSpaceWrapper")
     .def(py::init<std::shared_ptr<Args>>())
     .def("init", &StarSpace::init, "path"_a="")
-    .def("train", &StarSpace::train, py::call_guard<py::gil_scoped_release>());
+    .def("train", &StarSpace::train, py::call_guard<py::gil_scoped_release>())
+    .def("getDocVector", &StarSpace::getDocVector)
+    .def("getLabelVector", &StarSpace::getLabelVector);
 
 #ifdef VERSION_INFO
 m.attr("__version__") = VERSION_INFO;
