@@ -210,8 +210,6 @@ void StarSpace::train() {
       break;
     }
   }
-  saveModel(args_->model);
-  saveModelTsv(args_->model + ".tsv");
 }
 
 void StarSpace::parseDoc(

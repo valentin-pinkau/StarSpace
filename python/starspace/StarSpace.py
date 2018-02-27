@@ -73,6 +73,13 @@ class StarSpace:
             elif side == "RHS":
                 yield np.array(self.spw.getLabelVector(data, sep))[0, :]
 
+    def saveModel(self, filename):
+        assert self.spw is not None
+        self.spw.saveModel(filename)
+
+    def saveModelTsv(self, filename):
+        assert self.spw is not None
+        self.spw.saveModelTsv(filename)
 
 
 
