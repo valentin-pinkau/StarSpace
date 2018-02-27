@@ -51,6 +51,7 @@ class StarSpace:
               useWeight = False):
 
         a = build_args(locals())
+        a.isTrain = True
         self.spw = StarSpaceWrapper(a)
         self.spw.init(a.initModel)
         self.spw.train()
