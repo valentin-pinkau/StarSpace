@@ -84,18 +84,12 @@ void StarSpace::init(std::string path="") {
   parser_->resetDict(dict_);
   if (args_->debug) {dict_->save(cout);}
 
-  // init train data class
-  trainData_ = initData();
-  trainData_->loadFromFile(args_->trainFile, parser_);
+  // init and load data
+  initDataHandler();
 
   // init model with args and dict
   model_ = make_shared<EmbedModel>(args_, dict_);
 
-  // set validation data
-  if (!args_->validationFile.empty()) {
-    validData_ = initData();
-    validData_->loadFromFile(args_->validationFile, parser_);
-  }
 }
 
 void StarSpace::initFromSavedModel(const string& filename) {
