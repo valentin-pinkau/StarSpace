@@ -33,9 +33,6 @@ public:
 
   void getWordExamples(int idx, std::vector<ParseResults>& rslts) const override;
 
-  void loadFromFile(const std::string& file,
-                    std::shared_ptr<DataParser> parser) override;
-
   void getRandomRHS(std::vector<Base>& results, bool trainWord = false)
     const override;
 

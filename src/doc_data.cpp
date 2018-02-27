@@ -25,46 +25,6 @@ LayerDataHandler::LayerDataHandler(shared_ptr<Args> args) :
   InternDataHandler(args) {
 }
 
-void LayerDataHandler::loadFromFile(
-  const string& fileName,
-  shared_ptr<DataParser> parser) {
-
-  ifstream fin(fileName);
-  if (!fin.is_open()) {
-    std::cerr << fileName << " cannot be opened for loading!" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  fin.close();
-
-  cout << "Loading data from file : " << fileName << endl;
-  vector<Corpus> corpora(args_->thread);
-  foreach_line(
-    fileName,
-    [&](std::string& line) {
-      auto& corpus = corpora[getThreadID()];
-      ParseResults example;
-      if (parser->parse(line, example)) {
-        corpus.push_back(example);
-      }
-    },
-    args_->thread
-  );
-  // Glue corpora together.
-  auto totalSize = std::accumulate(corpora.begin(), corpora.end(), size_t(0),
-                     [](size_t l, Corpus& r) { return l + r.size(); });
-  size_t destCursor = examples_.size();
-  examples_.resize(totalSize + examples_.size());
-  for (const auto &subcorp: corpora) {
-    std::copy(subcorp.begin(), subcorp.end(), examples_.begin() + destCursor);
-    destCursor += subcorp.size();
-  }
-  cout << "Total number of examples loaded : " << examples_.size() << endl;
-  size_ = examples_.size();
-  if (size_ == 0) {
-    errorOnZeroExample(fileName);
-  }
-}
-
 void LayerDataHandler::insert(
     vector<Base>& rslt,
     const vector<Base>& ex,
