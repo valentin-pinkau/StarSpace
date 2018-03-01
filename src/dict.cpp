@@ -9,6 +9,7 @@
 
 #include "dict.h"
 #include "parser.h"
+#include "utils/utils.h"
 
 #include <assert.h>
 #include <algorithm>
@@ -124,34 +125,30 @@ void Dictionary::load(std::istream& in) {
     hashToIndex_[find(e.symbol)] = i;
   }
 }
+  /* Build dictionary from iterators.
+  * In dictionary building process, if the current dictionary is at 75% capacity,
+  * it automatically increases the threshold for both word and label.
+  * At the end the -minCount and -minCountLabel from arguments will be applied
+  * as thresholds.
+*/
 
-/* Build dictionary from file.
- * In dictionary building process, if the current dictionary is at 75% capacity,
- * it automatically increases the threshold for both word and label.
- * At the end the -minCount and -minCountLabel from arguments will be applied
- * as thresholds.
- */
-void Dictionary::readFromFile(
-    const std::string& file,
-    shared_ptr<DataParser> parser) {
+template <class D>
+void Dictionary::readFromIter(
+  D cbegin,
+  D cend,
+  std::shared_ptr <DataParser> parser) {
 
-  cout << "Build dict from input file : " << file << endl;
-  ifstream fin(file);
-  if (!fin.is_open()) {
-    cerr << "Input file cannot be opened!" << endl;
-    exit(EXIT_FAILURE);
-  }
   int64_t minThreshold = 1;
   size_t lines_read = 0;
-  std::string line;
-  while (getline(fin, line)) {
-    vector<string> tokens;
+  for (auto line_it = cbegin; line_it != cend; ++line_it) {
+    auto line = *line_it;
+    std::vector <std::string> tokens;
     parser->parseForDict(line, tokens);
     lines_read++;
     for (auto token : tokens) {
       insert(token);
       if ((ntokens_ % 1000000 == 0) && args_->verbose) {
-        std::cerr << "\rRead " << ntokens_  / 1000000 << "M words" << std::flush;
+        std::cerr << "\rRead " << ntokens_ / 1000000 << "M words" << std::flush;
       }
       if (size_ > 0.75 * MAX_VOCAB_SIZE) {
         minThreshold++;
@@ -159,11 +156,10 @@ void Dictionary::readFromFile(
       }
     }
   }
-  fin.close();
 
   threshold(args_->minCount, args_->minCountLabel);
 
-  std::cerr << "\rRead " << ntokens_  / 1000000 << "M words" << std::endl;
+  std::cerr << "\rRead " << ntokens_ / 1000000 << "M words" << std::endl;
   std::cerr << "Number of words in dictionary:  " << nwords_ << std::endl;
   std::cerr << "Number of labels in dictionary: " << nlabels_ << std::endl;
   if (lines_read == 0) {
@@ -175,6 +171,26 @@ void Dictionary::readFromFile(
               << std::endl;
     exit(EXIT_FAILURE);
   }
+}
+
+
+/* Build dictionary from file.
+ * turn ifstream into line iterator and pass it to readFromIter
+ */
+void Dictionary::readFromFile(
+    const std::string& file,
+    shared_ptr<DataParser> parser) {
+
+  cout << "Build dict from input file : " << file << endl;
+  ifstream fin(file);
+  if (!fin.is_open()) {
+    cerr << "Input file cannot be opened!" << endl;
+    exit(EXIT_FAILURE);
+  }
+  auto begin = Line_iter(fin);
+  auto end = Line_iter();
+  readFromIter(begin, end, parser);
+
 }
 
 // Sort the dictionary by [word, label] order and by number of occurance.
@@ -224,5 +240,12 @@ void Dictionary::loadDictFromModel(const string& modelfile) {
   std::cout << "Number of words in dictionary:  " << nwords_ << std::endl;
   std::cout << "Number of labels in dictionary: " << nlabels_ << std::endl;
 }
+
+template void Dictionary::readFromIter<std::istream_iterator<Line>>(std::istream_iterator<Line> cbegin,
+                                                                    std::istream_iterator<Line> cend,
+                                                                    std::shared_ptr <DataParser> parser);
+template void Dictionary::readFromIter<std::vector<std::string>::const_iterator>(std::vector<std::string>::const_iterator cbegin,
+                                                                                 std::vector<std::string>::const_iterator cend,
+                                                                                 std::shared_ptr <DataParser> parser);
 
 } // namespace

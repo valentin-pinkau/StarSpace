@@ -17,6 +17,16 @@
 
 namespace starspace {
 
+class Line : public std::string
+{
+  friend std::istream & operator>>(std::istream & is, Line & line)
+  {
+    return std::getline(is, line);
+  }
+};
+
+using Line_iter = std::istream_iterator<Line>;
+
 struct Metrics {
   float hit1, hit10, hit20, hit50, rank;
   int32_t count;
@@ -95,6 +105,8 @@ std::streampos tellg(Stream& s) {
   return retval;
 }
 }
+
+
 
 // Apply a closure pointwise to every line of a file.
 template<typename String=std::string,

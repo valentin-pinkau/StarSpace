@@ -1,12 +1,13 @@
 from starspace_wrapper import Args
 from starspace_wrapper import StarSpaceWrapper
+from starspace_wrapper import VectorString
 
 import numpy as np
 
 def build_args(args):
     a = Args()
     for (k, v) in args.items():
-        if k != "self":
+        if k not in ["self", "trainData", "validationData"]:
             setattr(a, k, v)
     return a
 
@@ -16,7 +17,10 @@ class StarSpace:
         self.spw = None
 
     def train(self,
-              trainFile,
+              trainData = None,
+              validationData = None,
+              trainFile = "",
+              validationFile = "",
               model = "model",
               initModel = "",
               lr = 0.01,
@@ -50,11 +54,16 @@ class StarSpace:
               saveTempModel = False,
               useWeight = False):
 
+        assert trainData is not None or trainFile != ""
+
         a = build_args(locals())
         a.isTrain = True
         self.spw = StarSpaceWrapper(a)
-        self.spw.init(a.initModel)
-        self.spw.train()
+        if trainData is None:
+            self.spw.train()
+        else:
+            if validationData is None : validationData = []
+            self.spw.train(VectorString(trainData), VectorString(validationData))
 
     def getVector(self, input_data,  model="", sep="\t ", side="LHS"):
 

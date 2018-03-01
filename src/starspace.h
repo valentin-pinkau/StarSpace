@@ -25,9 +25,11 @@ class StarSpace {
   public:
     explicit StarSpace(std::shared_ptr<Args> args);
 
-    void init(std::string path);
     void train();
+    void train(const std::vector<std::string> & trainingData,
+               const std::vector<std::string> & validationData);
     void evaluate();
+    void evaluate(const std::vector<std::string> & testData);
 
     MatrixRow getNgramVector(const std::string& phrase);
     Matrix<Real> getDocVector(
@@ -58,11 +60,12 @@ class StarSpace {
     std::shared_ptr<Args> args_;
     std::vector<std::vector<Base>> baseDocs_;
   private:
+    void train_internal();
+    void evaluate_internal();
     bool load_model_if_set(std::string path);
     void initFromTsv(const std::string& filename);
     void initFromSavedModel(const std::string& filename);
     void initParser();
-    void initDataHandler();
     std::shared_ptr<InternDataHandler> initData();
     Metrics evaluateOne(
         const std::vector<Base>& lhs,

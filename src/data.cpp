@@ -15,6 +15,7 @@
 #include <fstream>
 #include <cassert>
 #include <numeric>
+#include <algorithm>
 
 using namespace std;
 
@@ -34,6 +35,21 @@ void InternDataHandler::errorOnZeroExample(const string& fileName) {
             << "Do the examples contain proper feature and label according to the trainMode? "
             << "If your examples are unlabeled, try to set trainMode=5.\n";
   exit(EXIT_FAILURE);
+}
+
+void InternDataHandler::loadFromVector(
+    const std::vector<std::string> & input,
+    shared_ptr<DataParser> parser) {
+    std::for_each(input.cbegin(), input.cend(), [parser, this](std::string element){
+      ParseResults example;
+      if (parser->parse(element, example)) {
+        this->examples_.push_back(example);
+      }
+    });
+    this->size_ = this->examples_.size();
+    if (this->size_ == 0) {
+      errorOnZeroExample("given vector");
+    }
 }
 
 void InternDataHandler::loadFromFile(

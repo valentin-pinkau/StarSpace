@@ -21,6 +21,9 @@ class InternDataHandler {
 public:
   explicit InternDataHandler(std::shared_ptr<Args> args);
 
+  virtual void loadFromVector(const std::vector<std::string>& input,
+                            std::shared_ptr<DataParser> parser);
+
   virtual void loadFromFile(const std::string& file,
                             std::shared_ptr<DataParser> parser);
 

@@ -55,8 +55,9 @@ class Dictionary {
 
     void load(std::istream&);
     void save(std::ostream&) const;
+    template <class D>
+    void readFromIter(D cbegin, D cend, std::shared_ptr<DataParser>);
     void readFromFile(const std::string&, std::shared_ptr<DataParser>);
-    bool readWord(std::istream&, std::string&) const;
 
     void threshold(int64_t, int64_t);
     void computeCounts();
@@ -66,11 +67,6 @@ class Dictionary {
     static const int32_t MAX_VOCAB_SIZE = 30000000;
 
     int32_t find(const std::string&) const;
-
-    void addNgrams(
-        std::vector<int32_t>& line,
-        const std::vector<int32_t>& hashes,
-        int32_t n) const;
 
     std::shared_ptr<Args> args_;
     std::vector<entry> entryList_;

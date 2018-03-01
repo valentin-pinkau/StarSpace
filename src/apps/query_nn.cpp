@@ -30,7 +30,6 @@ int main(int argc, char** argv) {
     k = atoi(argv[2]);
   }
   StarSpace sp(args);
-  sp.init(args->model);
   cout << "------Loaded model args:\n";
   args->printArgs();
 

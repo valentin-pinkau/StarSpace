@@ -27,7 +27,18 @@ StarSpace::StarSpace(shared_ptr<Args> args)
   , validData_(nullptr)
   , testData_(nullptr)
   , model_(nullptr)
-  {}
+  {
+    cout << "Start to initialize starspace model.\n";
+    assert(args_ != nullptr);
+    auto filename = (args_->isTrain) ? args_->initModel : args_->model;
+
+    // load dict and model
+    load_model_if_set(filename);
+
+    // init parser
+    initParser();
+
+  }
 
 void StarSpace::initParser() {
   if (args_->fileFormat == "fastText") {
@@ -40,22 +51,6 @@ void StarSpace::initParser() {
   }
 }
 
-void StarSpace::initDataHandler() {
-  if (args_->isTrain) {
-    trainData_ = initData();
-    trainData_->loadFromFile(args_->trainFile, parser_);
-    // set validation data
-    if (!args_->validationFile.empty()) {
-      validData_ = initData();
-      validData_->loadFromFile(args_->validationFile, parser_);
-    }
-  } else {
-    if (args_->testFile != "") {
-      testData_ = initData();
-      testData_->loadFromFile(args_->testFile, parser_);
-    }
-  }
-}
 
 shared_ptr<InternDataHandler> StarSpace::initData() {
   if (args_->fileFormat == "fastText") {
@@ -67,29 +62,6 @@ shared_ptr<InternDataHandler> StarSpace::initData() {
     exit(EXIT_FAILURE);
   }
   return nullptr;
-}
-
-// initialize dict and load data
-void StarSpace::init(std::string path="") {
-  cout << "Start to initialize starspace model.\n";
-  assert(args_ != nullptr);
-
-  if(load_model_if_set(path)) return;
-
-  // build dict
-  initParser();
-  dict_ = make_shared<Dictionary>(args_);
-  auto filename = args_->trainFile;
-  dict_->readFromFile(filename, parser_);
-  parser_->resetDict(dict_);
-  if (args_->debug) {dict_->save(cout);}
-
-  // init and load data
-  initDataHandler();
-
-  // init model with args and dict
-  model_ = make_shared<EmbedModel>(args_, dict_);
-
 }
 
 void StarSpace::initFromSavedModel(const string& filename) {
@@ -120,10 +92,6 @@ void StarSpace::initFromSavedModel(const string& filename) {
   model_ = make_shared<EmbedModel>(args_, dict_);
   model_->load(in);
   cout << "Model loaded.\n";
-
-  // init data parser
-  initParser();
-  initDataHandler();
 }
 
 void StarSpace::initFromTsv(const string& filename) {
@@ -155,10 +123,6 @@ void StarSpace::initFromTsv(const string& filename) {
   // load Model
   model_ = make_shared<EmbedModel>(args_, dict_);
   model_->loadTsv(filename, "\t ");
-
-  // init data parser
-  initParser();
-  initDataHandler();
 }
 
 bool StarSpace::load_model_if_set(std::string path) {
@@ -176,6 +140,50 @@ bool StarSpace::load_model_if_set(std::string path) {
 }
 
 void StarSpace::train() {
+  if (!dict_) {
+    dict_ = make_shared<Dictionary>(args_);
+    // init dict
+    dict_->readFromFile(args_->trainFile, parser_);
+    parser_->resetDict(dict_);
+    if (args_->debug) {dict_->save(cout);}
+
+    // init model with args and dict
+    model_ = make_shared<EmbedModel>(args_, dict_);
+  }
+
+  // init training data
+  trainData_ = initData();
+  trainData_->loadFromFile(args_->trainFile, parser_);
+  if (!args_->validationFile.empty()) {
+    validData_ = initData();
+    validData_->loadFromFile(args_->validationFile, parser_);
+  }
+  train_internal();
+}
+
+void StarSpace::train(const std::vector<std::string> & trainingData,
+                      const std::vector<std::string> & validationData) {
+  if (!dict_) {
+    dict_ = make_shared<Dictionary>(args_);
+    // init dict
+    dict_->readFromIter(trainingData.cbegin(), trainingData.cend(), parser_);
+    parser_->resetDict(dict_);
+    if (args_->debug) {dict_->save(cout);}
+
+    // init model with args and dict
+    model_ = make_shared<EmbedModel>(args_, dict_);
+  }
+
+  trainData_ = initData();
+  trainData_->loadFromVector(trainingData, parser_);
+  if (!validationData.empty()) {
+    validData_ = initData();
+    validData_->loadFromVector(validationData, parser_);
+  }
+  train_internal();
+}
+
+void StarSpace::train_internal() {
 
   float rate = args_->lr;
   float decrPerEpoch = (rate - 1e-9) / args_->epoch;
@@ -197,7 +205,7 @@ void StarSpace::train() {
     printf("\n ---+++ %20s %4d Train error : %3.8f +++--- %c%c%c\n",
            "Epoch", i, err,
            0xe2, 0x98, 0x83);
-    if (validData_ != nullptr) {
+    if (validData_ && validData_->getSize() > 0) {
       auto valid_err = model_->test(validData_, args_->thread);
       cout << "Validation error: " << valid_err << endl;
     }
@@ -380,6 +388,18 @@ void StarSpace::printDoc(ostream& ofs, const vector<Base>& tokens) {
 }
 
 void StarSpace::evaluate() {
+  testData_ = initData();
+  testData_->loadFromFile(args_->testFile, parser_);
+  evaluate_internal();
+}
+
+void StarSpace::evaluate(const std::vector<std::string> & testData) {
+  testData_ = initData();
+  testData_->loadFromVector(testData, parser_);
+  evaluate_internal();
+}
+
+void StarSpace::evaluate_internal() {
   // check that it is not in trainMode 5
   if (args_->trainMode == 5) {
     std::cerr << "Test is undefined in trainMode 5. Please use other trainMode for testing.\n";

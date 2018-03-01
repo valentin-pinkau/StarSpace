@@ -29,7 +29,6 @@ int main(int argc, char** argv) {
   }
 
   StarSpace sp(args);
-  sp.init(args->model);
   // Set dropout probability to 0 in test case.
   sp.args_->dropoutLHS = 0.0;
   sp.args_->dropoutRHS = 0.0;
