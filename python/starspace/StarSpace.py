@@ -70,8 +70,9 @@ class StarSpace:
         assert side in ["LHS", "RHS"]
 
         if model != "":
-            self.spw = StarSpaceWrapper(Args())
-            self.spw.init(model)
+            a = Args()
+            a.model = model
+            self.spw = StarSpaceWrapper(a)
 
         assert self.spw is not None
 
