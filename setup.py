@@ -116,7 +116,7 @@ setup(
     description='Python binding for StarSpace',
     long_description='',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.2'],
+    install_requires=['pybind11>=2.2', 'numpy'],
     cmdclass={'build_ext': BuildExt},
     packages=[
         str('starspace'),
