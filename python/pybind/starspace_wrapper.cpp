@@ -80,10 +80,10 @@ PYBIND11_MODULE(starspace_wrapper, m) {
 
   py::class_<StarSpace>(m, "StarSpaceWrapper")
     .def(py::init<std::shared_ptr<Args>>())
-    .def("train", py::overload_cast<>(&StarSpace::train), py::call_guard<py::gil_scoped_release>())
-    .def("train", py::overload_cast<
+    .def("train", (void (StarSpace::*)())(&StarSpace::train), py::call_guard<py::gil_scoped_release>())
+    .def("train", (void (StarSpace::*)(
            const std::vector<std::string> &,
-           const std::vector<std::string> &>(&StarSpace::train),
+           const std::vector<std::string> &))(&StarSpace::train),
          py::call_guard<py::gil_scoped_release>())
     .def("getDocVector", &StarSpace::getDocVector)
     .def("getLabelVector", &StarSpace::getLabelVector)
